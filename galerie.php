@@ -126,7 +126,7 @@ function error ($word, $arg = '') {
 
 function generate_html_title($dirname) {
     $htmlTitle = '';
-    $dirArray = split("/", $dirname);
+    $dirArray = explode("/", $dirname);
     $dirArrayLength = sizeof($dirArray);
     for ($i = 0; $i < $dirArrayLength; $i++) {
         if ($i == 0)
@@ -154,18 +154,19 @@ function generate_thumb($thumb, $file) {
     global $png;
     global $bg;
 
-    if (eregi($jpg, $file))
+    
+    if (preg_match("/$jpg/i", $file))
         $original = @imagecreatefromjpeg($file);
-    elseif (eregi($gif, $file))
+    elseif (preg_match("/$gif/i", $file))
         $original = @imagecreatefromgif($file);
-    elseif (eregi($png, $file))
+    elseif (preg_match("/$png/i", $file))
         $original = @imagecreatefrompng($file);
     else
-        continue;
+        return;
     if ($original) {
         if (function_exists('getimagesize'))
             list($width, $height, $type, $attr) = getimagesize($file);
-        else continue;
+        else return;
         if ($width >= $height && $width > $thumbsize) {
             $smallwidth = $thumbsize;
             $smallheight = floor($height / ($width / $smallwidth));
@@ -222,7 +223,7 @@ function print_subdirectory_list($dirs) {
         if ($delim == '\\')
             $target = strtr($target, '\\', '/');
         if ($target == '') {
-            $url = ereg_replace('^([^?]+).*$', '\1', $_SERVER['REQUEST_URI']);
+            $url = explode('?', $_SERVER['REQUEST_URI'], 2)[0];
             if (!empty($urlsuffix)) {
                 if (strstr($url, '?') === false)
                     $url .= '?' . substr($urlsuffix, 1);
@@ -367,7 +368,7 @@ else {
         $file = $realdir . $delim . $filename;
         if (is_dir($file))
             $dirs[] = $filename;
-        elseif (eregi($query, $file))
+        elseif (preg_match("/$query/i", $file))
             $pics[] = $filename;
     }
     closedir($d);
